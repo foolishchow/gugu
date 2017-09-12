@@ -1,6 +1,6 @@
 # gugu
 ---
-> similar to `gulp` 
+> similar to `gulp`
 just write to some specify sence to use Steam.pipe easier
 
 - ## API
@@ -20,7 +20,7 @@ just write to some specify sence to use Steam.pipe easier
     gugu.dest('path')
     ```
     - rename   
-    require an callBack or string 
+    require an callBack or string
     ```javascript
     gugu.rename()
     ```
@@ -53,7 +53,7 @@ just write to some specify sence to use Steam.pipe easier
     - through
     ```javascript
     let transform = function(chunk,encoding,callback){
-        // no arrow function 
+        // no arrow function
         // gugu would pass an new instance to you
         // do sth
         this.push(chunk)
@@ -65,11 +65,22 @@ just write to some specify sence to use Steam.pipe easier
     };
     gugu.through(transform,flash)
     ```
-
+    - zip    
+    decompress files matched in zip
+    ```javascript
+    gugu.zip(file,globs)
+        .pipe(gugu.dest(dest))
+    ```
+    - gzip   
+    decompress files matched in gzip
+    ```javascript
+    gugu.gzip(file,globs)
+        .pipe(gugu.dest(dest))
+    ```
 
  - about task options
- ```
-    options = {
+ ```javascript
+    var options = {
         before:'sth',
         before(log){
             log('sth')
@@ -80,6 +91,3 @@ just write to some specify sence to use Steam.pipe easier
         },
     }
  ```
-
-
-
