@@ -1,6 +1,6 @@
 {
   "name": "gugu",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "a light weight `gulp` ",
   "main": "index.js",
   "scripts": {
@@ -26,7 +26,10 @@
   "dependencies": {
     "colors": "^1.1.2",
     "fs-extra": "^4.0.1",
+    "glob-base": "^0.3.0",
     "glob-stream": "^6.1.0",
-    "glob-watcher": "^4.0.0"
+    "glob-watcher": "^4.0.0",
+    "jszip": "^3.1.4",
+    "tar-stream": "^1.5.4"
   }
 }
