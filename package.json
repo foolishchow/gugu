@@ -1,6 +1,6 @@
 {
   "name": "gugu",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "a light weight `gulp` ",
   "main": "index.js",
   "scripts": {
