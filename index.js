@@ -58,11 +58,12 @@ module.exports.src = function(globs) {
                     fs.readFile(chunk.path, enco, (err, data) => {
                         if (err) {
                             console.info(err.stack);
-                            data = new Buffer('', encoding);
+                            data = new Buffer('', enco);
                         }
+                        chunk.encoding = enco;
                         chunk.fileName = path.relative(chunk.base, chunk.path);
-                        chunk.content = new Buffer(data, encoding);
-                        this.push(chunk);
+                        chunk.content = new Buffer(data, enco);
+                        this.push(chunk,enco);
                         callback();
                     })
                 })
@@ -87,7 +88,7 @@ const dest = function(dest) {
         fsExtra.ensureFile(fileName)
             .then(() => {
                 fs.writeFile(fileName, chunk.content, {
-                    encoding,
+                    encoding:chunk.encoding||encoding,
                     mode
                 }, (err) => {
                     if (err) console.info(err.stack);
