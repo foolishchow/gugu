@@ -5,7 +5,8 @@ const Stream = require('stream'),
     gs = require('glob-stream'),
     gw = require('glob-watcher'),
     colors = require('colors'),
-    Through = require('./lib/through');
+    Through = require('./lib/through'),
+    magic = require('stream-mmmagic');;
 const date = () => {
     let d = new Date;
     let to2 = val => ((100 + val) / 100).toFixed(2).replace(/^[0-9]+\./gi, '')
@@ -19,7 +20,10 @@ module.exports = {};
  * @param {Function|undefined} flush
  */
 const through = function(transform, flush = c => c()) {
-    let _t = new Through({ transform, flush })
+    let _t = new Through({
+        transform,
+        flush
+    })
     _t.on('finish', () => {
         process.nextTick(() => {
             _t = undefined;
@@ -46,17 +50,39 @@ module.exports.src = function(globs) {
                 callback();
                 return;
             }
-            fs.readFile(chunk.path, encoding, (err, data) => {
-                if (err) {
-                    console.info(err.stack);
-                    data = new Buffer('', encoding);
-                }
-                chunk.fileName = path.relative(chunk.base, chunk.path);
-                chunk.content = new Buffer(data, encoding);
-                this.push(chunk);
-                callback();
-            })
-        }catch(e){
+            let input = fs.createReadStream(chunk.path);
+            magic(input, (err, mime, output) => {
+                if (err) throw err;
+
+                fs.readFile(chunk.path, mime.encoding, (err, data) => {
+                    if (err) {
+                        console.info(err.stack);
+                        data = new Buffer('', encoding);
+                    }
+                    chunk.fileName = path.relative(chunk.base, chunk.path);
+                    chunk.content = new Buffer(data, encoding);
+                    this.push(chunk);
+                    callback();
+                })
+                // console.log('TYPE:', mime.type);
+                // console.log('ENCODING:', mime.encoding);
+
+                // will print the *whole* file 
+                // output.pipe(process.stdout);
+            });
+            // encoding = fileEncoding(path.extname(chunk.path));
+            // fs.readFile(chunk.path, encoding, (err, data) => {
+            //     if (err) {
+            //         console.info(err.stack);
+            //         data = new Buffer('', encoding);
+            //     }
+            //     chunk.fileName = path.relative(chunk.base, chunk.path);
+            //     chunk.content = new Buffer(data, encoding);
+            //     this.push(chunk);
+            //     callback();
+            // })
+        }
+        catch (e) {
             // this.push(chunk);
             callback();
         }
@@ -75,7 +101,10 @@ const dest = function(dest) {
             mode = chunk.mode || 0o666;
         fsExtra.ensureFile(fileName)
             .then(() => {
-                fs.writeFile(fileName, chunk.content, { encoding, mode }, (err) => {
+                fs.writeFile(fileName, chunk.content, {
+                    encoding,
+                    mode
+                }, (err) => {
                     if (err) console.info(err.stack);
                     this.push(chunk)
                     callback();
@@ -148,7 +177,8 @@ const remove = function(cb) {
                     })
                 }
             })
-        } else {
+        }
+        else {
             remove(chunk).then(a => {
                 this.push(chunk)
                 callback();
@@ -163,7 +193,10 @@ const getArgvs = function(argv) {
     if (typeof argv[0] == 'function') argv.unshift([]);
 
     if (argv.length == 1) argv.push(function() {});
-    if (argv.length == 2) argv.push({ before: '', after: '' });
+    if (argv.length == 2) argv.push({
+        before: '',
+        after: ''
+    });
     if (typeof argv[0] == 'string') argv[0] = [argv[0]];
     return argv;
 }
@@ -183,20 +216,26 @@ const task = function(name, ...argv) {
 module.exports.task = task;
 
 const dispatchWatch = (task, done) => {
-    let { depends, cb, options } = task;
+    let {
+        depends,
+        cb,
+        options
+    } = task;
     depends = [].concat(depends);
     let runner = () => {
         runTask(depends.shift()).then(() => {
             if (depends.length > 0) {
                 runner()
-            } else {
+            }
+            else {
                 run(task, done);
             }
         })
     }
     if (depends.length > 0) {
         runner();
-    } else {
+    }
+    else {
         run(task, done);
     }
 }
@@ -204,7 +243,11 @@ const watch = function(globs, ...argv) {
     getArgvs(argv)
     let [depends, cb, options] = argv;
     gw(globs, function(done) {
-        dispatchWatch({ depends, cb, options }, done);
+        dispatchWatch({
+            depends,
+            cb,
+            options
+        }, done);
     })
 }
 module.exports.watch = watch;
@@ -219,13 +262,20 @@ const taskCaller = function(callback) {
     if (callback && typeof callback == 'function') {
         let result = callback(log);
         if (result) console.info(`[${date()}] ${colors.cyan(result)} `);
-    } else if (callback && typeof callback == 'string') {
+    }
+    else if (callback && typeof callback == 'string') {
         console.info(`[${date()}] ${colors.cyan(callback)} `);
     }
 }
 const run = function(taskConfig, next) {
-    let { cb, options } = taskConfig;
-    let { after, before } = options;
+    let {
+        cb,
+        options
+    } = taskConfig;
+    let {
+        after,
+        before
+    } = options;
     let doAfter = () => {
         taskCaller(after);
         next();
@@ -234,9 +284,11 @@ const run = function(taskConfig, next) {
     let result = cb();
     if (result instanceof Through) {
         result.on('finish', () => doAfter())
-    } else if (result instanceof Promise) {
+    }
+    else if (result instanceof Promise) {
         result.then(() => doAfter())
-    } else {
+    }
+    else {
         doAfter();
     }
 }
@@ -256,12 +308,14 @@ const runTask = function(task) {
     console.info(`[${date()}] Starting ${colors.blue(`'${task}'`)} ...`)
     if (depends.length == 0) {
         run(taskConfig, next)
-    } else {
+    }
+    else {
         let runner = () => {
             runTask(depends.shift()).then(() => {
                 if (depends.length > 0) {
                     runner()
-                } else {
+                }
+                else {
                     run(taskConfig, next);
                 }
             })
