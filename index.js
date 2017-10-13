@@ -6,7 +6,7 @@ const Stream = require('stream'),
     gw = require('glob-watcher'),
     colors = require('colors'),
     Through = require('./lib/through'),
-    magic = require('stream-mmmagic');;
+    ENCODING = require('./lib/file-encoding.js');;
 const date = () => {
     let d = new Date;
     let to2 = val => ((100 + val) / 100).toFixed(2).replace(/^[0-9]+\./gi, '')
@@ -51,39 +51,24 @@ module.exports.src = function(globs) {
                 return;
             }
             let input = fs.createReadStream(chunk.path);
-            magic(input, (err, mime, output) => {
-                if (err) throw err;
-
-                fs.readFile(chunk.path, mime.encoding, (err, data) => {
-                    if (err) {
-                        console.info(err.stack);
-                        data = new Buffer('', encoding);
-                    }
-                    chunk.fileName = path.relative(chunk.base, chunk.path);
-                    chunk.content = new Buffer(data, encoding);
-                    this.push(chunk);
-                    callback();
+            ENCODING(chunk.path)
+                .then(enco => {
+                    // console.info(`file:=>${chunk.path}`)
+                    // console.info(`encoding:=>${enco}`)
+                    fs.readFile(chunk.path, enco, (err, data) => {
+                        if (err) {
+                            console.info(err.stack);
+                            data = new Buffer('', encoding);
+                        }
+                        chunk.fileName = path.relative(chunk.base, chunk.path);
+                        chunk.content = new Buffer(data, encoding);
+                        this.push(chunk);
+                        callback();
+                    })
                 })
-                // console.log('TYPE:', mime.type);
-                // console.log('ENCODING:', mime.encoding);
 
-                // will print the *whole* file 
-                // output.pipe(process.stdout);
-            });
-            // encoding = fileEncoding(path.extname(chunk.path));
-            // fs.readFile(chunk.path, encoding, (err, data) => {
-            //     if (err) {
-            //         console.info(err.stack);
-            //         data = new Buffer('', encoding);
-            //     }
-            //     chunk.fileName = path.relative(chunk.base, chunk.path);
-            //     chunk.content = new Buffer(data, encoding);
-            //     this.push(chunk);
-            //     callback();
-            // })
         }
         catch (e) {
-            // this.push(chunk);
             callback();
         }
 

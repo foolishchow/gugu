@@ -141,10 +141,6 @@ braces@^1.8.2:
     preserve "^0.2.0"
     repeat-element "^1.1.2"
 
-buffer-peek-stream@^1.0.0:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/buffer-peek-stream/-/buffer-peek-stream-1.0.1.tgz#53b47570a1347787c5bad4ca2ca3021f9d8b3cfd"
-
 caseless@~0.12.0:
   version "0.12.0"
   resolved "https://registry.yarnpkg.com/caseless/-/caseless-0.12.0.tgz#1b681c21ff84033c826543090689420d187151dc"
@@ -619,6 +615,10 @@ jsbn@~0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/jsbn/-/jsbn-0.1.1.tgz#a5e654c2e5a2deb5f201d96cefbca80c0ef2f513"
 
+jschardet@^1.5.1:
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/jschardet/-/jschardet-1.5.1.tgz#c519f629f86b3a5bedba58a88d311309eec097f9"
+
 json-schema@0.2.3:
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/json-schema/-/json-schema-0.2.3.tgz#b480c892e59a2f05954ce727bd3f2a4e882f9e13"
@@ -732,17 +732,11 @@ minimist@^1.2.0:
   dependencies:
     minimist "0.0.8"
 
-mmmagic@^0.4.0:
-  version "0.4.5"
-  resolved "https://registry.yarnpkg.com/mmmagic/-/mmmagic-0.4.5.tgz#883468e4423a75937674350018c4062d215eb2e2"
-  dependencies:
-    nan "^2.4.0"
-
 ms@2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.0.0.tgz#5608aeadfc00be6c2901df5f9861788de0d597c8"
 
-nan@^2.3.0, nan@^2.4.0:
+nan@^2.3.0:
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.7.0.tgz#d95bf721ec877e08db276ed3fc6eb78f9083ad46"
 
@@ -1035,13 +1029,6 @@ sshpk@^1.7.0:
 stream-exhaust@^1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/stream-exhaust/-/stream-exhaust-1.0.2.tgz#acdac8da59ef2bc1e17a2c0ccf6c320d120e555d"
-
-stream-mmmagic@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/stream-mmmagic/-/stream-mmmagic-2.0.0.tgz#7af96260451bc8bc569a853036b157311cea7c31"
-  dependencies:
-    buffer-peek-stream "^1.0.0"
-    mmmagic "^0.4.0"
 
 stream-shift@^1.0.0:
   version "1.0.0"
